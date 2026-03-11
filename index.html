@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FCE Part 1 Tutor</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e; --paper: #f5f0e8; --accent: #c0392b; --gold: #d4a017;
+    --muted: #7a7060; --success: #27ae60; --warning: #e67e22; --card: #fffdf7; --border: #d4cfc4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+  header { background: var(--ink); color: var(--paper); padding: 0.8rem 2rem; border-bottom: 4px solid var(--gold); display: flex; align-items: center; justify-content: space-between; }
+  header span { font-size: 0.75rem; color: var(--gold); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: 1.3rem; }
+  .hright { text-align: right; font-size: 0.82rem; color: #aaa; }
+  .hright strong { color: var(--gold); font-size: 1.1rem; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 1.5rem; }
+  .wrap-wide { max-width: 1020px; margin: 0 auto; padding: 1.2rem 1.5rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 2rem; box-shadow: 4px 4px 0 var(--border); margin-bottom: 1.2rem; }
+  .card h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 0.8rem; }
+  .instr { background: #fef9ec; border-left: 4px solid var(--gold); padding: 0.9rem 1.1rem; margin-bottom: 1.5rem; font-size: 0.88rem; line-height: 1.8; }
+  .instr strong { color: var(--accent); }
+  label { display: block; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; color: var(--muted); }
+  input[type="text"], input[type="password"] { width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--border); border-radius: 3px; font-family: 'Source Sans 3', sans-serif; font-size: 0.92rem; background: white; color: var(--ink); margin-bottom: 1rem; }
+  input:focus { outline: none; border-color: var(--accent); }
+  .btn { border: none; border-radius: 3px; font-family: 'Source Sans 3', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; padding: 0.75rem 1.5rem; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #a93226; }
+  .btn-primary:disabled { background: var(--muted); cursor: not-allowed; }
+  .btn-success { background: var(--success); color: white; }
+  .btn-success:hover { background: #219a52; }
+  .btn-success:disabled { background: var(--muted); cursor: not-allowed; }
+  .btn-gold { background: var(--gold); color: var(--ink); }
+  .btn-gold:hover { background: #b8900f; }
+  .btn-full { width: 100%; padding: 1rem; font-size: 1rem; }
+
+  /* Upload */
+  .upload-zone { border: 2px dashed var(--border); border-radius: 4px; padding: 2.5rem 2rem; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 1rem; background: white; }
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: #fff5f5; }
+  .upload-zone .icon { font-size: 3rem; margin-bottom: 0.6rem; }
+  .upload-zone p { color: var(--muted); font-size: 0.9rem; margin-top: 0.3rem; }
+  .upload-zone strong { color: var(--ink); font-size: 1rem; }
+  .upload-zone .filename { color: var(--success); font-weight: 600; font-size: 0.9rem; margin-top: 0.5rem; display: none; }
+  input[type="file"] { display: none; }
+
+  .status-box { padding: 0.9rem 1.1rem; border-radius: 3px; font-size: 0.88rem; margin-bottom: 1rem; display: none; line-height: 1.6; }
+  .status-box.loading { background: #fef9ec; border-left: 4px solid var(--gold); color: var(--ink); }
+  .status-box.loading::before { content: ''; display: inline-block; width: 13px; height: 13px; border: 2px solid #e0d090; border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 0.6rem; vertical-align: middle; }
+  .status-box.success { background: #f0fff4; border-left: 4px solid var(--success); color: #1a6b3a; }
+  .status-box.error { background: #fde8e8; border-left: 4px solid var(--accent); color: var(--accent); }
+
+  .preview-box { background: white; border: 1px solid var(--border); border-radius: 3px; padding: 1rem 1.2rem; margin-bottom: 1rem; font-size: 0.88rem; line-height: 1.7; max-height: 220px; overflow-y: auto; display: none; }
+  .preview-box h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.6rem; }
+
+  .link-box { background: var(--ink); color: var(--paper); border-radius: 4px; padding: 1.5rem; margin-top: 0.5rem; display: none; }
+  .link-box h3 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 0.8rem; }
+  .link-text { background: rgba(255,255,255,0.1); border-radius: 3px; padding: 0.8rem 1rem; font-family: monospace; font-size: 0.78rem; word-break: break-all; margin-bottom: 0.8rem; line-height: 1.5; }
+  .link-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+
+  /* Student / quiz */
+  #student-setup, #example-screen, #quiz-screen, #results-screen { display: none; }
+
+  .example-box { background: #f0f4ff; border: 1px solid #c5cfee; border-radius: 4px; padding: 1.2rem 1.5rem; margin-bottom: 1.2rem; font-size: 0.95rem; line-height: 1.8; }
+  .ex-label { font-weight: 700; color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+  .ex-options { display: flex; gap: 1.5rem; margin-top: 0.5rem; font-size: 0.92rem; flex-wrap: wrap; }
+
+  .progress-wrap { background: var(--border); height: 3px; margin-bottom: 1rem; }
+  .progress-bar { height: 100%; background: var(--accent); transition: width 0.4s; }
+  .quiz-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: start; }
+  .text-panel { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 1.2rem 1.5rem; box-shadow: 3px 3px 0 var(--border); position: sticky; top: 1rem; max-height: calc(100vh - 100px); overflow-y: auto; }
+  .text-panel-title { font-family: 'Playfair Display', serif; font-size: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 1rem; }
+  .text-panel p { font-size: 0.9rem; line-height: 1.9; margin-bottom: 0.8rem; }
+  .gap { font-weight: 700; color: var(--accent); }
+  .gap.active { background: var(--accent); color: white; border-radius: 3px; padding: 1px 5px; }
+
+  .translate-widget { margin-top: 1.2rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+  .translate-widget label { font-size: 0.78rem; margin-bottom: 0.4rem; }
+  .translate-row { display: flex; gap: 0.5rem; }
+  .translate-row input { flex: 1; padding: 0.4rem 0.7rem; font-size: 0.85rem; margin-bottom: 0; }
+  .btn-tr { background: var(--ink); color: var(--paper); border: none; border-radius: 3px; padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: 'Source Sans 3', sans-serif; }
+  .btn-tr:hover { background: #2d2d4e; }
+  .tr-result { margin-top: 0.5rem; font-size: 0.83rem; color: var(--muted); font-style: italic; min-height: 1.2rem; line-height: 1.5; }
+  .tr-loading { display: none; font-size: 0.8rem; color: var(--muted); margin-top: 0.3rem; }
+  .tr-loading::after { content: ''; display: inline-block; width: 12px; height: 12px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 0.4rem; vertical-align: middle; }
+
+  .qpanel { display: flex; flex-direction: column; gap: 0.8rem; }
+  .qhead { background: var(--ink); color: var(--paper); border-radius: 4px; padding: 0.8rem 1.2rem; font-family: 'Playfair Display', serif; font-size: 0.95rem; }
+  .qhead span { color: var(--gold); font-size: 0.75rem; display: block; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem; }
+  .options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .opt { padding: 0.7rem 1rem; border: 1.5px solid var(--border); border-radius: 3px; background: white; cursor: pointer; font-family: 'Source Sans 3', sans-serif; font-size: 0.92rem; text-align: left; transition: all 0.15s; display: flex; align-items: center; gap: 0.7rem; }
+  .opt:hover:not(:disabled) { border-color: var(--accent); background: #fff5f5; padding-left: 1.3rem; }
+  .opt .ltr { font-weight: 700; font-size: 0.78rem; color: white; background: var(--muted); border-radius: 2px; padding: 1px 5px; min-width: 20px; text-align: center; }
+  .opt.correct { border-color: var(--success); background: #f0fff4; }
+  .opt.correct .ltr { background: var(--success); }
+  .opt.wrong { border-color: var(--accent); background: #fff5f5; }
+  .opt.wrong .ltr { background: var(--accent); }
+  .opt:disabled { cursor: not-allowed; opacity: 0.85; }
+
+  .fbbox { padding: 1rem 1.2rem; border-radius: 3px; font-size: 0.87rem; line-height: 1.65; display: none; }
+  .fbbox.hint { background: #fef9ec; border-left: 4px solid var(--gold); }
+  .fbbox.ok { background: #f0fff4; border-left: 4px solid var(--success); }
+  .fbbox.ko { background: #f8f8ff; border-left: 4px solid #7c7cb5; }
+  .fbbox .fbt { font-weight: 700; margin-bottom: 0.5rem; font-size: 0.88rem; }
+  .spin-inline { font-size: 0.82rem; color: var(--muted); padding: 0.3rem 0; display: none; }
+  .spin-inline::after { content: ''; display: inline-block; width: 13px; height: 13px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 0.4rem; vertical-align: middle; }
+  .btn-next { background: var(--accent); color: white; border: none; border-radius: 3px; padding: 0.75rem 1.5rem; font-family: 'Source Sans 3', sans-serif; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: none; align-self: flex-start; }
+  .btn-next:hover { background: #a93226; }
+
+  .res-card { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 2rem; box-shadow: 4px 4px 0 var(--border); text-align: center; margin-bottom: 1.2rem; }
+  .res-card h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 0.5rem; }
+  .bigscore { font-size: 3.5rem; font-weight: 700; color: var(--accent); font-family: 'Playfair Display', serif; line-height: 1; margin: 0.8rem 0; }
+  .bigscore span { font-size: 1.3rem; color: var(--muted); }
+  .breakdown { display: flex; justify-content: center; gap: 2rem; margin: 1.2rem 0; }
+  .bdi .num { font-size: 1.6rem; font-weight: 700; font-family: 'Playfair Display', serif; }
+  .bdi .lbl { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .bdi.g .num { color: var(--success); } .bdi.o .num { color: var(--warning); } .bdi.r .num { color: var(--accent); }
+  .sum-card { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; box-shadow: 4px 4px 0 var(--border); margin-bottom: 1.2rem; }
+  .sum-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .sum-table th { background: var(--ink); color: var(--paper); padding: 0.5rem 0.8rem; text-align: left; }
+  .sum-table td { padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+  .sum-table tr:nth-child(even) td { background: #faf8f3; }
+  .tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 2px; font-size: 0.75rem; font-weight: 600; }
+  .tag.f { background: #d4edda; color: var(--success); }
+  .tag.h { background: #ffecd2; color: var(--warning); }
+  .tag.z { background: #fde8e8; color: var(--accent); }
+  .class-box { background: var(--ink); color: var(--paper); border-radius: 4px; padding: 1.5rem; }
+  .class-box h3 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 0.6rem; }
+  .copy-text { background: rgba(255,255,255,0.1); border-radius: 3px; padding: 0.8rem; font-family: monospace; font-size: 0.82rem; white-space: pre-wrap; margin: 0.6rem 0; }
+  .btn-copy { background: var(--gold); color: var(--ink); border: none; padding: 0.5rem 1.2rem; border-radius: 3px; font-family: 'Source Sans 3', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (max-width: 700px) { .quiz-layout { grid-template-columns: 1fr; } .text-panel { position: static; max-height: 220px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <span>Cambridge FCE — Use of English Part 1</span>
+    <h1 id="main-title">Interactive Tutor</h1>
+  </div>
+  <div class="hright" id="header-score" style="display:none">
+    Q <strong id="hq">1</strong>/<span id="htot">12</span> &nbsp;|&nbsp; Score: <strong id="hs">0</strong>
+  </div>
+</header>
+
+<!-- ══ TEACHER ══ -->
+<div id="teacher-setup">
+<div class="wrap">
+  <div class="card">
+    <h2>⚙️ Teacher Setup</h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:1.5rem;">Upload a PDF of a Cambridge FCE past paper. Claude will automatically find the Use of English Part 1 exercise and the answer key, then generate a link to share with your students.</p>
+
+    <div class="instr">
+      <strong>What you need:</strong><br>
+      • A PDF of a Cambridge FCE past paper that includes both the Use of English Part 1 exercise <em>and</em> the answer key (usually on the last page).<br>
+      • Your Anthropic API key.
+    </div>
+
+    <label>Your Anthropic API Key</label>
+    <input type="password" id="t-api-key" placeholder="sk-ant-...">
+
+    <label>Upload FCE Past Paper PDF</label>
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('pdf-input').click()" ondragover="ev.preventDefault()" ondrop="dropPdf(event)">
+      <div class="icon">📑</div>
+      <p><strong>Click to upload</strong> or drag & drop</p>
+      <p>PDF file — must include exercise and answer key</p>
+      <div class="filename" id="pdf-filename"></div>
+    </div>
+    <input type="file" id="pdf-input" accept="application/pdf" onchange="loadPdf(this)">
+
+    <div class="status-box" id="extract-status"></div>
+
+    <div class="preview-box" id="preview-box">
+      <h4>Extracted content — verify before generating link</h4>
+      <div id="preview-content"></div>
+    </div>
+
+    <button class="btn btn-success btn-full" id="extract-btn" onclick="extractFromPdf()" disabled>
+      Extract exercise from PDF →
+    </button>
+
+    <div class="link-box" id="link-box">
+      <h3>✅ Link ready — share with your students</h3>
+      <p style="font-size:0.82rem;color:#aaa;margin-bottom:0.5rem;">Click the field below to select the link, then Ctrl+C to copy:</p>
+      <input type="text" id="link-text" readonly
+        onclick="this.select()"
+        style="width:100%;padding:0.7rem 1rem;border-radius:3px;border:none;
+               font-family:monospace;font-size:0.78rem;background:rgba(255,255,255,0.12);
+               color:#fff;cursor:pointer;margin-bottom:0.8rem;">
+      <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
+        <button class="btn btn-gold" id="btn-copy-long" onclick="copyLongLink()">📋 Copy link</button>
+        <button class="btn btn-primary" onclick="testLink()">👁 Test as student</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ STUDENT SETUP ══ -->
+<div id="student-setup">
+<div class="wrap">
+  <div class="card">
+    <h2>Welcome</h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:1.5rem;">Enter your API key to begin the exercise.</p>
+    <div class="instr">
+      <strong>How it works:</strong><br>
+      • The text is always visible — answer one question at a time.<br>
+      • Wrong answer → hint → second chance.<br>
+      • <strong>1 point</strong> for correct first attempt · <strong>0.5 points</strong> for correct second attempt.<br>
+      • Translate any word using the box on the left.<br>
+      • At the end, copy your score and post it on <strong>Google Classroom</strong>.
+    </div>
+    <label>Anthropic API Key</label>
+    <input type="password" id="s-api-key" placeholder="sk-ant-...">
+    <button class="btn btn-primary btn-full" id="start-btn" onclick="goToExample()" disabled>Continue →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ EXAMPLE ══ -->
+<div id="example-screen">
+<div class="wrap">
+  <div class="card">
+    <h2>Before you start</h2>
+    <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">Choose the word (A, B, C or D) which best fits each gap. There is an example at the beginning (0).</p>
+    <div class="example-box">
+      <div class="ex-label">Example (0)</div>
+      <p id="ex-sentence" style="margin:0.3rem 0;font-weight:500"></p>
+      <div class="ex-options" id="ex-options"></div>
+    </div>
+    <p id="ex-note" style="font-size:0.88rem;color:var(--muted);line-height:1.6;margin-bottom:1.2rem;background:#fef9ec;border-left:4px solid var(--gold);padding:0.8rem 1rem;border-radius:2px"></p>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;">💡 <strong>Tip:</strong> Look at the words around the gap — prepositions, verbs and fixed expressions will often tell you what word is needed.</p>
+    <button class="btn btn-success btn-full" onclick="startQuiz()">Start the exercise →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ QUIZ ══ -->
+<div id="quiz-screen">
+<div class="wrap-wide">
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  <div class="quiz-layout">
+    <div class="text-panel">
+      <div class="text-panel-title" id="tpt"></div>
+      <div id="text-body"></div>
+      <div class="translate-widget">
+        <label>🇮🇹 Traduci una parola</label>
+        <div class="translate-row">
+          <input type="text" id="tr-input" placeholder="Scrivi una parola…" onkeydown="if(event.key==='Enter')doTr()">
+          <button class="btn-tr" onclick="doTr()">Traduci</button>
+        </div>
+        <div class="tr-loading" id="tr-loading">Traduco</div>
+        <div class="tr-result" id="tr-result"></div>
+      </div>
+    </div>
+    <div class="qpanel">
+      <div class="qhead"><span id="qlabel">Question 1</span>Choose the best option for the highlighted gap:</div>
+      <div class="options" id="opts"></div>
+      <div class="spin-inline" id="spin">Thinking</div>
+      <div class="fbbox" id="fbbox"></div>
+      <button class="btn-next" id="btn-next" onclick="nextQ()">Next question →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ RESULTS ══ -->
+<div id="results-screen">
+<div class="wrap" style="max-width:700px">
+  <div class="res-card">
+    <h2>Exercise Complete!</h2>
+    <div class="bigscore" id="bigscore">0<span id="bigtot">/12</span></div>
+    <div id="perfmsg" style="color:var(--muted);font-size:0.95rem;margin-bottom:0.5rem;"></div>
+    <div class="breakdown">
+      <div class="bdi g"><div class="num" id="cf">0</div><div class="lbl">1pt — 1st try</div></div>
+      <div class="bdi o"><div class="num" id="ch">0</div><div class="lbl">0.5pt — 2nd try</div></div>
+      <div class="bdi r"><div class="num" id="cz">0</div><div class="lbl">0pt — missed</div></div>
+    </div>
+  </div>
+  <div class="sum-card">
+    <table class="sum-table">
+      <thead><tr><th>Q</th><th>Correct answer</th><th>Your answer</th><th>Points</th></tr></thead>
+      <tbody id="sum-body"></tbody>
+    </table>
+  </div>
+  <div class="class-box">
+    <h3>📋 Post this on Google Classroom</h3>
+    <div class="copy-text" id="copy-text"></div>
+    <button class="btn-copy" onclick="doCopy()">Copy to clipboard</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+let EX = null;           // exercise data
+let teacherKey = '';
+let studentKey = '';
+let pdfBase64 = null;
+let curQ = 0, score = 0, att = 0, results = [];
+
+// ═══════════════════════════════════
+// ROUTING
+// ═══════════════════════════════════
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  const data = params.get('data');
+  if (data) {
+    try {
+      EX = JSON.parse(decodeURIComponent(atob(data)));
+      document.getElementById('main-title').textContent = EX.title;
+      show('student-setup');
+      document.getElementById('s-api-key').addEventListener('input', e => {
+        document.getElementById('start-btn').disabled = !e.target.value.trim();
+      });
+    } catch(e) {
+      document.body.innerHTML = '<div style="padding:2rem;font-family:sans-serif;color:#c0392b">Invalid or corrupted exercise link. Please ask your teacher for a new one.</div>';
+    }
+    return;
+  }
+  show('teacher-setup');
+  document.getElementById('main-title').textContent = 'Teacher Setup';
+  document.getElementById('t-api-key').addEventListener('input', checkExtractReady);
+}
+
+function show(id) {
+  ['teacher-setup','student-setup','example-screen','quiz-screen','results-screen']
+    .forEach(s => document.getElementById(s).style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+}
+
+// ═══════════════════════════════════
+// PDF HANDLING
+// ═══════════════════════════════════
+function dropPdf(e) {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') processPdf(file);
+}
+
+function loadPdf(input) {
+  if (input.files[0]) processPdf(input.files[0]);
+}
+
+function processPdf(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    pdfBase64 = e.target.result.split(',')[1];
+    const fn = document.getElementById('pdf-filename');
+    fn.textContent = '✓ ' + file.name;
+    fn.style.display = 'block';
+    checkExtractReady();
+  };
+  reader.readAsDataURL(file);
+}
+
+function checkExtractReady() {
+  const hasKey = document.getElementById('t-api-key').value.trim().length > 0;
+  document.getElementById('extract-btn').disabled = !(hasKey && pdfBase64);
+}
+
+// ═══════════════════════════════════
+// EXTRACTION FROM PDF
+// ═══════════════════════════════════
+async function extractFromPdf() {
+  teacherKey = document.getElementById('t-api-key').value.trim();
+  const status = document.getElementById('extract-status');
+  const btn = document.getElementById('extract-btn');
+
+  status.className = 'status-box loading';
+  status.textContent = 'Reading PDF and extracting Use of English Part 1…';
+  status.style.display = 'block';
+  document.getElementById('preview-box').style.display = 'none';
+  document.getElementById('link-box').style.display = 'none';
+  btn.disabled = true;
+
+  const prompt = `You are reading a Cambridge English exam PDF (could be B1 Preliminary, B2 First/FCE, or similar level).
+
+Your task:
+1. Find the MULTIPLE CHOICE CLOZE section — a text with numbered gaps where each gap has 4 options (A, B, C, D). There may be an example gap (0). Extract:
+   - The title of the text
+   - The full text with gaps marked as (0), (1), (2)... 
+   - For gap (0) if present: the example word and all four options A B C D
+   - For all numbered gaps: all four options A B C D
+
+2. Find the ANSWER KEY section (usually at the end of the document). Extract the correct letter (A/B/C/D) for each question.
+
+Return ONLY a valid JSON object with this exact structure, no markdown, no preamble, no explanation — just the raw JSON:
+{
+  "title": "title of the text",
+  "paragraphs": ["full paragraph 1 with gaps like (1) .....", "paragraph 2", "..."],
+  "example": {
+    "word": "the correct answer word for gap (0), or empty string if no example",
+    "A": "option A", "B": "option B", "C": "option C", "D": "option D",
+    "note": "brief explanation in Italian why this answer is correct"
+  },
+  "questions": [
+    {"n": 1, "A": "opt A", "B": "opt B", "C": "opt C", "D": "opt D", "correct": "B"},
+    {"n": 2, "A": "opt A", "B": "opt B", "C": "opt C", "D": "opt D", "correct": "D"}
+  ]
+}
+
+CRITICAL RULES:
+- In paragraphs, mark gaps exactly like: (1) ..... or (2) .....
+- Include the correct answer letter in each question object
+- If there is no example (0), set example.word to "" and leave options empty
+- Return ONLY the JSON object, starting with { and ending with }. No other text whatsoever.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': teacherKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 3000,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'document',
+              source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 }
+            },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    if (!resp.ok) {
+      const e = await resp.json();
+      throw new Error(e.error?.message || `HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    const raw = data.content.map(b => b.text || '').join('').trim();
+    const clean = raw.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/```\s*$/i,'').trim();
+    EX = JSON.parse(clean);
+
+    // Show preview
+    const prev = document.getElementById('preview-content');
+    const answers = EX.questions.map(q => `${q.n}:${q.correct}`).join('  ');
+    prev.innerHTML = `<strong>${EX.title}</strong><br><br>
+      ${EX.paragraphs.join('<br><br>')}<br><br>
+      <strong>Answers extracted:</strong> ${answers}`;
+    document.getElementById('preview-box').style.display = 'block';
+
+    status.className = 'status-box success';
+    status.textContent = `✓ Extracted "${EX.title}" — ${EX.questions.length} questions with answers. Verify above, then generate the link.`;
+
+    // Auto-generate link
+    generateLink();
+
+  } catch(e) {
+    status.className = 'status-box error';
+    status.textContent = `Error: ${e.message}`;
+    btn.disabled = false;
+  }
+}
+
+function generateLink() {
+  const encoded = btoa(encodeURIComponent(JSON.stringify(EX)));
+  const url = `${window.location.origin}${window.location.pathname}?data=${encoded}`;
+  document.getElementById('link-text').value = url;
+  document.getElementById('link-box').style.display = 'block';
+  document.getElementById('link-box').scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyToClip(text, btn, label) {
+  navigator.clipboard.writeText(text.trim()).then(() => {
+    btn.textContent = '✓ Copiato!';
+    setTimeout(() => btn.textContent = label, 2000);
+  }).catch(() => {
+    // fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text.trim();
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✓ Copiato!';
+    setTimeout(() => btn.textContent = label, 2000);
+  });
+}
+
+function copyLongLink() {
+  const url = document.getElementById('link-text').value;
+  copyToClip(url, document.getElementById('btn-copy-long'), '📋 Copy full link');
+}
+
+function copyShortLink() {
+  const url = document.getElementById('short-link').textContent;
+  const btn = document.querySelector('#short-area .btn-gold');
+  copyToClip(url, btn, '📋 Copy short link');
+}
+
+async function shortenLink() {
+  const url = document.getElementById('link-text').value;
+  const status = document.getElementById('shorten-status');
+  const btn = document.getElementById('btn-shorten');
+  btn.textContent = '⏳ Shortening…';
+  btn.disabled = true;
+  status.style.display = 'block';
+  status.textContent = 'Contacting is.gd…';
+  try {
+    const resp = await fetch(`https://api.shrtco.de/v2/shorten?url=${encodeURIComponent(url)}`);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error || 'Unknown error');
+    const short = data.result.full_short_link;
+    document.getElementById('short-link').textContent = short;
+    document.getElementById('short-area').style.display = 'block';
+    status.style.display = 'none';
+  } catch(e) {
+    status.style.display = 'block';
+    status.textContent = 'Could not shorten: ' + e.message;
+  }
+  btn.textContent = '🔗 Shorten link';
+  btn.disabled = false;
+}
+
+function testLink() {
+  window.location.href = document.getElementById('link-text').value;
+}
+
+// ═══════════════════════════════════
+// STUDENT FLOW
+// ═══════════════════════════════════
+function goToExample() {
+  studentKey = document.getElementById('s-api-key').value.trim();
+  show('example-screen');
+  const ex = EX.example;
+  document.getElementById('ex-sentence').textContent = `The gap (0) is filled with: "${ex.word}"`;
+  const el = document.getElementById('ex-options');
+  el.innerHTML = ['A','B','C','D'].map(l => ex[l] ?
+    `<span>${l} ${ex[l].toLowerCase()===(ex.word||'').toLowerCase()?'<strong>':''
+    }${ex[l]}${ex[l].toLowerCase()===(ex.word||'').toLowerCase()?'✓</strong>':''}</span>`
+  : '').join('');
+  document.getElementById('ex-note').textContent = ex.note || 'Always look at the words around the gap for clues.';
+}
+
+function startQuiz() {
+  show('quiz-screen');
+  document.getElementById('main-title').textContent = EX.title;
+  document.getElementById('header-score').style.display = 'block';
+  document.getElementById('tpt').textContent = EX.title;
+  document.getElementById('htot').textContent = EX.questions.length;
+  curQ = 0; score = 0; results = [];
+  showQ(0);
+}
+
+// ═══════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════
+function renderText(activeNum) {
+  const html = EX.paragraphs.map(p =>
+    '<p>' + p.replace(/\((\d+)\)/g, (m, n) => {
+      const num = parseInt(n);
+      if (num === 0) return `<span class="gap">(0) ${EX.example.word||'…'}</span>`;
+      return `<span class="gap${num===activeNum?' active':''}">(${n})</span>`;
+    }) + '</p>'
+  ).join('');
+  document.getElementById('text-body').innerHTML = html;
+}
+
+function showQ(idx) {
+  curQ = idx; att = 1;
+  const q = EX.questions[idx];
+  if (!q) { showResults(); return; }
+  document.getElementById('progress-bar').style.width = `${(idx/EX.questions.length)*100}%`;
+  document.getElementById('qlabel').textContent = `Question ${idx+1} of ${EX.questions.length}`;
+  document.getElementById('hq').textContent = idx+1;
+  document.getElementById('hs').textContent = score%1===0?score:score.toFixed(1);
+  renderText(q.n);
+  const area = document.getElementById('opts');
+  area.innerHTML = '';
+  ['A','B','C','D'].forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="ltr">${l}</span> ${q[l]}`;
+    btn.onclick = () => answerQ(l, btn);
+    area.appendChild(btn);
+  });
+  document.getElementById('fbbox').style.display = 'none';
+  document.getElementById('fbbox').className = 'fbbox';
+  document.getElementById('btn-next').style.display = 'none';
+  document.getElementById('spin').style.display = 'none';
+  document.getElementById('tr-result').textContent = '';
+  document.getElementById('tr-input').value = '';
+}
+
+async function answerQ(chosen, btn) {
+  const q = EX.questions[curQ];
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  const fb = document.getElementById('fbbox');
+  const spin = document.getElementById('spin');
+
+  if (chosen === q.correct) {
+    btn.classList.add('correct');
+    const pts = att===1 ? 1 : 0.5;
+    score += pts;
+    document.getElementById('hs').textContent = score%1===0?score:score.toFixed(1);
+    results.push({n:q.n, correct:q.correct, cw:q[q.correct], chosen, pts});
+    spin.style.display = 'block';
+    const expl = await claude(promptExpl(q, chosen, true));
+    spin.style.display = 'none';
+    fb.className = 'fbbox ok';
+    fb.style.display = 'block';
+    fb.innerHTML = `<div class="fbt">✓ Corretto! ${pts===1?'+1 punto':'+0.5 punti'}</div>${expl}`;
+    document.getElementById('btn-next').style.display = 'inline-block';
+
+  } else {
+    btn.classList.add('wrong');
+    if (att === 1) {
+      att = 2;
+      spin.style.display = 'block';
+      const hint = await claude(promptHint(q, chosen));
+      spin.style.display = 'none';
+      fb.className = 'fbbox hint';
+      fb.style.display = 'block';
+      fb.innerHTML = `<div class="fbt">✗ Non è giusto — ecco un suggerimento:</div>${hint}<br><em style="font-size:0.82rem;color:var(--muted)">Riprova con un'altra opzione.</em>`;
+      document.querySelectorAll('.opt').forEach(b => { if (!b.classList.contains('wrong')) b.disabled = false; });
+    } else {
+      results.push({n:q.n, correct:q.correct, cw:q[q.correct], chosen, pts:0});
+      document.querySelectorAll('.opt').forEach(b => { if (b.querySelector('.ltr').textContent===q.correct) b.classList.add('correct'); });
+      spin.style.display = 'block';
+      const expl = await claude(promptExpl(q, chosen, false));
+      spin.style.display = 'none';
+      fb.className = 'fbbox ko';
+      fb.style.display = 'block';
+      fb.innerHTML = `<div class="fbt">✗ La risposta corretta è ${q.correct}: <em>${q[q.correct]}</em></div>${expl}`;
+      document.getElementById('btn-next').style.display = 'inline-block';
+    }
+  }
+}
+
+// ═══════════════════════════════════
+// PROMPTS
+// ═══════════════════════════════════
+function promptHint(q, chosen) {
+  const txt = EX.paragraphs.join(' ');
+  return `Sei un insegnante di inglese che aiuta uno studente italiano a prepararsi per il Cambridge FCE.
+
+Testo dell'esercizio: "${txt}"
+
+Domanda ${q.n} — opzioni: A) ${q.A}  B) ${q.B}  C) ${q.C}  D) ${q.D}
+Risposta corretta: ${q.correct} — "${q[q.correct]}"
+Lo studente ha scelto: ${chosen} — "${q[chosen]}"
+
+Scrivi un BREVE suggerimento in italiano (2-3 frasi):
+- Guarda le parole esatte intorno al gap nel testo (preposizioni, verbi, strutture) e usale per guidare lo studente.
+- Spiega perché "${q[chosen]}" non funziona in quel contesto.
+- Indica che tipo di parola serve, SENZA rivelare la risposta corretta.`;
+}
+
+function promptExpl(q, chosen, ok) {
+  const txt = EX.paragraphs.join(' ');
+  return `Sei un insegnante di inglese che spiega a uno studente italiano perché una risposta è giusta o sbagliata in un esercizio FCE Use of English Part 1.
+
+Testo dell'esercizio: "${txt}"
+
+Domanda ${q.n} — opzioni: A) ${q.A}  B) ${q.B}  C) ${q.C}  D) ${q.D}
+Risposta corretta: ${q.correct} — "${q[q.correct]}"
+Lo studente ha scelto: ${chosen} — ${ok?'(CORRETTO)':'(SBAGLIATO)'}
+
+Scrivi una spiegazione in italiano chiara e concreta. Struttura:
+✅ Perché "${q[q.correct]}" è la risposta giusta — cita le parole esatte del testo intorno al gap (preposizioni, verbi, strutture fisse) e spiega come portano a questa scelta.
+❌ Perché le altre tre opzioni non vanno — per ciascuna spiega concretamente il problema.
+
+Insegna allo studente a leggere i segnali nel testo. Cita sempre le parole del testo.`;
+}
+
+// ═══════════════════════════════════
+// TRANSLATION
+// ═══════════════════════════════════
+async function doTr() {
+  const word = document.getElementById('tr-input').value.trim();
+  if (!word) return;
+  document.getElementById('tr-loading').style.display = 'block';
+  document.getElementById('tr-result').textContent = '';
+  const r = await claude(`Stai aiutando uno studente italiano che studia inglese per il Cambridge FCE.
+Traduci in italiano: "${word}"
+Formato: "${word}" = [traduzione]
+Aggiungi una breve frase d'esempio in inglese con traduzione italiana. Sii breve.`);
+  document.getElementById('tr-loading').style.display = 'none';
+  document.getElementById('tr-result').innerHTML = r;
+}
+
+// ═══════════════════════════════════
+// API
+// ═══════════════════════════════════
+async function claude(prompt, retries=2) {
+  for (let i=0; i<=retries; i++) {
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': studentKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 600,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      if (!resp.ok) { const e=await resp.json(); throw new Error(e.error?.message||`HTTP ${resp.status}`); }
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error.message);
+      return data.content.map(b=>b.text||'').join('').replace(/\n/g,'<br>');
+    } catch(e) {
+      if (i<retries) { await new Promise(r=>setTimeout(r,1000)); continue; }
+      return `<em style="color:var(--accent)">[Errore: ${e.message}]</em>`;
+    }
+  }
+}
+
+// ═══════════════════════════════════
+// NEXT / RESULTS
+// ═══════════════════════════════════
+function nextQ() {
+  if (curQ+1 >= EX.questions.length) showResults();
+  else showQ(curQ+1);
+}
+
+function showResults() {
+  show('results-screen');
+  document.getElementById('header-score').style.display = 'none';
+  const total = score%1===0?score:score.toFixed(1);
+  const nq = EX.questions.length;
+  document.getElementById('bigscore').innerHTML = `${total}<span>/${nq}</span>`;
+  const f=results.filter(r=>r.pts===1).length;
+  const h=results.filter(r=>r.pts===0.5).length;
+  const z=results.filter(r=>r.pts===0).length;
+  document.getElementById('cf').textContent=f;
+  document.getElementById('ch').textContent=h;
+  document.getElementById('cz').textContent=z;
+  const pct=(score/nq)*100;
+  document.getElementById('perfmsg').textContent = pct>=80?'🌟 Excellent work!':pct>=60?'👍 Good effort — keep practising!':'📚 Keep studying — you can do it!';
+  const tb=document.getElementById('sum-body');
+  tb.innerHTML='';
+  results.forEach(r=>{
+    const tr=document.createElement('tr');
+    const cls=r.pts===1?'f':r.pts===0.5?'h':'z';
+    const lbl=r.pts===1?'+1 pt':r.pts===0.5?'+0.5 pt':'0 pt';
+    tr.innerHTML=`<td>${r.n}</td><td><strong>${r.correct}</strong> — ${r.cw}</td><td>${r.chosen}</td><td><span class="tag ${cls}">${lbl}</span></td>`;
+    tb.appendChild(tr);
+  });
+  const now=new Date().toLocaleDateString('it-IT');
+  document.getElementById('copy-text').textContent=
+`FCE Use of English Part 1 — ${EX.title}\nDate: ${now}\nScore: ${total} / ${nq}\n  Correct (1st attempt): ${f}\n  Correct (2nd attempt): ${h}\n  Wrong: ${z}`;
+}
+
+function doCopy() {
+  navigator.clipboard.writeText(document.getElementById('copy-text').textContent).then(()=>{
+    const b=document.querySelector('.btn-copy');
+    b.textContent='✓ Copied!';
+    setTimeout(()=>b.textContent='Copy to clipboard',2000);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
